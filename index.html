@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart University Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <aside class="sidebar">
+    <h2>Smart Uni</h2>
+    <nav>
+      <button onclick="showSection('dashboard')">Dashboard</button>
+      <button onclick="showSection('schedule')">Schedule</button>
+      <button onclick="showSection('tasks')">Tasks</button>
+      <button onclick="showSection('notes')">Notes</button>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="section active">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card">Total Courses: <span id="courseCount">0</span></div>
+        <div class="card">Pending Tasks: <span id="taskCount">0</span></div>
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section id="schedule" class="section">
+      <h1>Schedule</h1>
+      <input id="scheduleInput" placeholder="e.g. Monday - Algorithms 10:00" />
+      <button onclick="addSchedule()">Add</button>
+      <ul id="scheduleList"></ul>
+    </section>
+
+    <!-- Tasks -->
+    <section id="tasks" class="section">
+      <h1>Tasks</h1>
+      <input id="taskInput" placeholder="New task..." />
+      <button onclick="addTask()">Add</button>
+      <ul id="taskList"></ul>
+    </section>
+
+    <!-- Notes -->
+    <section id="notes" class="section">
+      <h1>Notes</h1>
+      <textarea id="noteInput" placeholder="Write your note..."></textarea>
+      <button onclick="saveNote()">Save</button>
+      <div id="savedNote"></div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
