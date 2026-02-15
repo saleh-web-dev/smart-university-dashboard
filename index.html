@@ -1,59 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Smart University Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart University Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
+
+body{
+    background:#020617;
+    color:#E2E8F0;
+    min-height:100vh;
+    padding:20px;
+    overflow-x:hidden;
+}
+
+/* Canvas background */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+}
+
+/* Header */
+h1{
+    text-align:center;
+    margin-bottom:20px;
+    background:linear-gradient(135deg,#22D3EE,#8B5CF6,#F97316,#EF4444);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+/* Layout */
+.container{
+    max-width:1100px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+}
+
+/* Cards */
+.card{
+    background:rgba(15,23,42,0.65);
+    backdrop-filter:blur(18px);
+    padding:20px;
+    border-radius:16px;
+    border:1px solid rgba(139,92,246,0.4);
+    box-shadow:
+        0 0 25px rgba(139,92,246,0.25),
+        inset 0 0 15px rgba(139,92,246,0.15);
+}
+
+.card h2{
+    background:linear-gradient(135deg,#22D3EE,#8B5CF6,#F97316,#EF4444);
+    -webkit-background-clip:text;
+    color:transparent;
+    margin-bottom:10px;
+}
+
+/* Inputs */
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+    margin-bottom:10px;
+    border-radius:8px;
+    border:none;
+    background:#020617;
+    color:white;
+    border:1px solid rgba(139,92,246,0.4);
+}
+
+/* Button */
+button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(135deg,#22D3EE,#8B5CF6,#F97316,#EF4444);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+}
+
+/* Lists */
+ul{
+    list-style:none;
+    margin-top:10px;
+}
+
+li{
+    padding:8px;
+    background:rgba(139,92,246,0.1);
+    margin-bottom:6px;
+    border-radius:6px;
+    display:flex;
+    justify-content:space-between;
+}
+
+.done{
+    text-decoration:line-through;
+    opacity:0.5;
+}
+
+/* Stats */
+.stat{
+    font-size:28px;
+    font-weight:700;
+    text-align:center;
+    margin-top:10px;
+    color:#22D3EE;
+}
+
+/* ===== Floating Welcome Bubbles ===== */
+.welcome{
+    position:fixed;
+    padding:6px 14px;
+    border-radius:20px;
+    background:rgba(15,23,42,0.9);
+    border:1px solid rgba(139,92,246,0.6);
+    color:#C084FC;
+    font-size:12px;
+    pointer-events:none;
+    box-shadow:0 0 20px rgba(139,92,246,0.5);
+    animation:floatUp linear forwards;
+}
+
+@keyframes floatUp{
+    from{
+        transform:translateY(0);
+        opacity:1;
+    }
+    to{
+        transform:translateY(-250px);
+        opacity:0;
+    }
+}
+
+/* Responsive */
+@media(max-width:600px){
+    body{padding:10px}
+}
+</style>
 </head>
 <body>
 
-  <aside class="sidebar">
-    <h2>Smart Uni</h2>
-    <nav>
-      <button onclick="showSection('dashboard')">Dashboard</button>
-      <button onclick="showSection('schedule')">Schedule</button>
-      <button onclick="showSection('tasks')">Tasks</button>
-      <button onclick="showSection('notes')">Notes</button>
-    </nav>
-  </aside>
+<canvas id="bg"></canvas>
 
-  <main class="content">
+<h1>Smart University Dashboard</h1>
 
-    <!-- Dashboard -->
-    <section id="dashboard" class="section active">
-      <h1>Dashboard</h1>
-      <div class="cards">
-        <div class="card">Total Courses: <span id="courseCount">0</span></div>
-        <div class="card">Pending Tasks: <span id="taskCount">0</span></div>
-      </div>
-    </section>
+<div class="container">
 
-    <!-- Schedule -->
-    <section id="schedule" class="section">
-      <h1>Schedule</h1>
-      <input id="scheduleInput" placeholder="e.g. Monday - Algorithms 10:00" />
-      <button onclick="addSchedule()">Add</button>
-      <ul id="scheduleList"></ul>
-    </section>
+<div class="card">
+<h2>Overview</h2>
+<div>Courses</div>
+<div class="stat" id="courseCount">0</div>
+<div>Tasks</div>
+<div class="stat" id="taskCount">0</div>
+</div>
 
-    <!-- Tasks -->
-    <section id="tasks" class="section">
-      <h1>Tasks</h1>
-      <input id="taskInput" placeholder="New task..." />
-      <button onclick="addTask()">Add</button>
-      <ul id="taskList"></ul>
-    </section>
+<div class="card">
+<h2>Courses</h2>
+<input id="courseInput" placeholder="Add course">
+<button onclick="addCourse()">Add Course</button>
+<ul id="courseList"></ul>
+</div>
 
-    <!-- Notes -->
-    <section id="notes" class="section">
-      <h1>Notes</h1>
-      <textarea id="noteInput" placeholder="Write your note..."></textarea>
-      <button onclick="saveNote()">Save</button>
-      <div id="savedNote"></div>
-    </section>
+<div class="card">
+<h2>Tasks</h2>
+<input id="taskInput" placeholder="Add task">
+<button onclick="addTask()">Add Task</button>
+<ul id="taskList"></ul>
+</div>
 
-  </main>
+<div class="card">
+<h2>Notes</h2>
+<textarea id="notes" rows="6" placeholder="Write your notes..."></textarea>
+<button onclick="saveNotes()">Save Notes</button>
+</div>
 
-  <script src="app.js"></script>
+</div>
+
+<script>
+/* ===============================
+   DATA (localStorage)
+================================*/
+let courses = JSON.parse(localStorage.getItem("courses")) || [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let notes = localStorage.getItem("notes") || "";
+
+document.getElementById("notes").value = notes;
+
+function render(){
+    const courseList = document.getElementById("courseList");
+    const taskList = document.getElementById("taskList");
+
+    courseList.innerHTML="";
+    taskList.innerHTML="";
+
+    courses.forEach(c=>{
+        const li=document.createElement("li");
+        li.textContent=c;
+        courseList.appendChild(li);
+    });
+
+    tasks.forEach((t,i)=>{
+        const li=document.createElement("li");
+        li.innerHTML=`<span class="${t.done?'done':''}" onclick="toggleTask(${i})">${t.text}</span>`;
+        taskList.appendChild(li);
+    });
+
+    document.getElementById("courseCount").textContent=courses.length;
+    document.getElementById("taskCount").textContent=tasks.length;
+
+    localStorage.setItem("courses",JSON.stringify(courses));
+    localStorage.setItem("tasks",JSON.stringify(tasks));
+}
+
+function addCourse(){
+    const input=document.getElementById("courseInput");
+    if(input.value){
+        courses.push(input.value);
+        input.value="";
+        render();
+    }
+}
+
+function addTask(){
+    const input=document.getElementById("taskInput");
+    if(input.value){
+        tasks.push({text:input.value,done:false});
+        input.value="";
+        render();
+    }
+}
+
+function toggleTask(i){
+    tasks[i].done=!tasks[i].done;
+    render();
+}
+
+function saveNotes(){
+    localStorage.setItem("notes",document.getElementById("notes").value);
+}
+
+render();
+
+/* ===============================
+   STARS BACKGROUND (4 colors)
+================================*/
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const colors = ["#22D3EE","#8B5CF6","#F97316","#EF4444"];
+
+let stars=[];
+for(let i=0;i<250;i++){
+    stars.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        size:Math.random()*2,
+        color:colors[Math.floor(Math.random()*4)]
+    });
+}
+
+function drawStars(){
+    stars.forEach(s=>{
+        ctx.fillStyle=s.color;
+        ctx.globalAlpha=0.4+Math.random()*0.6;
+        ctx.fillRect(s.x,s.y,s.size,s.size);
+    });
+    ctx.globalAlpha=1;
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawStars();
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* ===============================
+   Floating Welcome
+================================*/
+function createWelcome(){
+    const w=document.createElement("div");
+    w.className="welcome";
+    w.innerText="WELCOME TO MY WEBSITE";
+
+    w.style.left=Math.random()*window.innerWidth+"px";
+    w.style.top=window.innerHeight+"px";
+    w.style.animationDuration=(5+Math.random()*3)+"s";
+
+    document.body.appendChild(w);
+    setTimeout(()=>w.remove(),8000);
+}
+
+setInterval(createWelcome,3000);
+</script>
+
 </body>
 </html>
